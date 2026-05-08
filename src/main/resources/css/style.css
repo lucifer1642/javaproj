@@ -1,0 +1,245 @@
+/* =====================================================================
+   RailPantry Global Stylesheet — All 7 Modules
+   ===================================================================== */
+
+/* Color Variables */
+.root {
+    -fx-primary-color: #1a365d;
+    -fx-secondary-color: #059669;
+    -fx-warning-color: #ca8a04;
+    -fx-danger-color: #dc2626;
+    -fx-bg-color: #f1f5f9;
+    -fx-card-bg: #FFFFFF;
+    -fx-text-color: #0f172a;
+    -fx-text-muted: #64748b;
+    -fx-text-light: #FFFFFF;
+    -fx-background-color: -fx-bg-color;
+    -fx-font-family: "Segoe UI", "Tahoma", sans-serif;
+}
+
+/* =====================================================================
+   Header & Train Details
+   ===================================================================== */
+.header-container {
+    -fx-background-color: linear-gradient(to right, #1e293b, #0f172a);
+    -fx-padding: 25px;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 5);
+}
+.train-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -fx-text-light;
+}
+.train-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #94a3b8;
+    -fx-font-weight: 600;
+}
+.train-info-pill {
+    -fx-background-color: rgba(255,255,255,0.1);
+    -fx-padding: 6px 14px;
+    -fx-background-radius: 20px;
+    -fx-text-fill: -fx-text-light;
+    -fx-font-weight: 600;
+    -fx-font-size: 12px;
+}
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-color;
+    -fx-padding: 10px 0 5px 0;
+}
+
+/* =====================================================================
+   Expiry Alert Banner (Module 2 — Inventory)
+   ===================================================================== */
+.banner-warning {
+    -fx-background-color: #fef3c7;
+    -fx-border-color: #f59e0b;
+    -fx-border-width: 0 0 0 5px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #92400e;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+/* =====================================================================
+   Summary / Metric Cards
+   ===================================================================== */
+.summary-container { -fx-padding: 10px 0 10px 0; }
+.summary-card {
+    -fx-background-color: -fx-card-bg;
+    -fx-background-radius: 12px;
+    -fx-padding: 25px 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 4);
+    -fx-min-width: 240px;
+    -fx-border-width: 0 0 0 6px;
+    -fx-border-radius: 12px;
+}
+.summary-card-blue  { -fx-border-color: #3b82f6; }
+.summary-card-green { -fx-border-color: #10b981; }
+.summary-card-amber { -fx-border-color: #f59e0b; }
+.summary-card-red   { -fx-border-color: #ef4444; }
+
+.card-title   { -fx-font-size: 12px; -fx-text-fill: -fx-text-muted; -fx-font-weight: bold; }
+.card-value   { -fx-font-size: 36px; -fx-font-weight: 900; -fx-text-fill: -fx-text-color; }
+.card-subtext { -fx-font-size: 12px; -fx-text-fill: -fx-secondary-color; -fx-font-weight: bold; }
+
+/* =====================================================================
+   Status Pills (TableCell Labels)
+   ===================================================================== */
+.status-pill-green  { -fx-background-color:#d1fae5; -fx-text-fill:#047857; -fx-font-weight:bold; -fx-font-size:12px; -fx-padding:3px 12px; -fx-background-radius:20px; }
+.status-pill-amber  { -fx-background-color:#fef9c3; -fx-text-fill:#a16207; -fx-font-weight:bold; -fx-font-size:12px; -fx-padding:3px 12px; -fx-background-radius:20px; }
+.status-pill-red    { -fx-background-color:#fecdd3; -fx-text-fill:#be123c; -fx-font-weight:bold; -fx-font-size:12px; -fx-padding:3px 12px; -fx-background-radius:20px; }
+.status-pill-orange { -fx-background-color:#ffedd5; -fx-text-fill:#c2410c; -fx-font-weight:bold; -fx-font-size:12px; -fx-padding:3px 12px; -fx-background-radius:20px; }
+.status-pill-blue   { -fx-background-color:#dbeafe; -fx-text-fill:#1d4ed8; -fx-font-weight:bold; -fx-font-size:12px; -fx-padding:3px 12px; -fx-background-radius:20px; }
+
+/* =====================================================================
+   Tables
+   ===================================================================== */
+.table-view {
+    -fx-background-color: -fx-card-bg;
+    -fx-border-color: transparent;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
+    -fx-padding: 5px;
+}
+.table-view .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-padding: 5px 0;
+}
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-font-weight: 800;
+    -fx-text-fill: -fx-text-muted;
+    -fx-font-size: 12px;
+    -fx-alignment: center-left;
+}
+.table-view .table-row-cell {
+    -fx-background-color: -fx-card-bg;
+    -fx-cell-size: 46px;
+    -fx-border-color: #f1f5f9;
+    -fx-border-width: 0 0 1 0;
+    -fx-font-size: 13px;
+    -fx-font-weight: 500;
+}
+.table-view .table-row-cell:odd { -fx-background-color: #f8fafc; }
+.table-view .table-row-cell:selected,
+.table-view .table-row-cell:selected .table-cell {
+    -fx-background-color: #eff6ff;
+    -fx-text-fill: #1d4ed8;
+}
+
+/* Inventory Row States */
+.table-view .row-expired           { -fx-background-color: #fecdd3; }
+.table-view .row-expired .table-cell { -fx-text-fill: #be123c; -fx-font-weight: bold; }
+.table-view .row-expiring-soon     { -fx-background-color: #ffedd5; }
+.table-view .row-expiring-soon .table-cell { -fx-text-fill: #c2410c; }
+.table-view .row-low-stock         { -fx-background-color: #fef9c3; }
+.table-view .row-low-stock .table-cell     { -fx-text-fill: #a16207; }
+
+/* Passenger Tracker Row States */
+.table-view .row-paid              { -fx-background-color: #d1fae5; }
+.table-view .row-paid .table-cell  { -fx-text-fill: #047857; }
+.table-view .row-pending           { -fx-background-color: #fef3c7; }
+.table-view .row-pending .table-cell { -fx-text-fill: #b45309; -fx-font-weight: bold; }
+.table-view .row-prepaid           { -fx-background-color: #dbeafe; }
+.table-view .row-prepaid .table-cell { -fx-text-fill: #1d4ed8; -fx-font-weight: bold; }
+
+/* =====================================================================
+   Buttons
+   ===================================================================== */
+.btn-primary {
+    -fx-background-color: linear-gradient(to right, #2563eb, #1d4ed8);
+    -fx-text-fill: -fx-text-light;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 24px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.3), 8, 0, 0, 4);
+}
+.btn-primary:hover {
+    -fx-background-color: linear-gradient(to right, #1d4ed8, #1e40af);
+    -fx-translate-y: -1px;
+    -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.4), 10, 0, 0, 5);
+}
+.btn-danger {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-danger-color;
+    -fx-border-color: -fx-danger-color;
+    -fx-border-radius: 8px;
+    -fx-border-width: 2px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 22px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+.btn-danger:hover {
+    -fx-background-color: #fef2f2;
+    -fx-translate-y: -1px;
+    -fx-effect: dropshadow(gaussian, rgba(220,38,38,0.2), 10, 0, 0, 3);
+}
+
+/* =====================================================================
+   Charts
+   ===================================================================== */
+.chart-pie          { -fx-border-color: transparent; -fx-border-width: 0; }
+.chart-pie-label    { -fx-fill: #64748b; -fx-font-size: 12px; -fx-font-weight: bold; }
+
+.default-color0.chart-bar, .default-color0.chart-pie { -fx-bar-fill: #3b82f6; -fx-pie-color: #3b82f6; }
+.default-color1.chart-bar, .default-color1.chart-pie { -fx-bar-fill: #10b981; -fx-pie-color: #10b981; }
+.default-color2.chart-bar, .default-color2.chart-pie { -fx-bar-fill: #f59e0b; -fx-pie-color: #f59e0b; }
+.default-color3.chart-bar, .default-color3.chart-pie { -fx-bar-fill: #8b5cf6; -fx-pie-color: #8b5cf6; }
+.default-color4.chart-bar, .default-color4.chart-pie { -fx-bar-fill: #ec4899; -fx-pie-color: #ec4899; }
+.default-color5.chart-bar, .default-color5.chart-pie { -fx-bar-fill: #14b8a6; -fx-pie-color: #14b8a6; }
+
+.chart-plot-background          { -fx-background-color: transparent; }
+.chart-vertical-grid-lines      { -fx-stroke: transparent; }
+.chart-horizontal-grid-lines    { -fx-stroke: #e2e8f0; -fx-stroke-dash-array: 5 5; }
+.chart-bar:hover                { -fx-opacity: 0.8; }
+.axis-label                     { -fx-text-fill: #475569; -fx-font-weight: bold; }
+.axis                           { -fx-tick-label-fill: #64748b; -fx-border-color: transparent; }
+
+.chart-line-symbol {
+    -fx-background-color: #3b82f6, white;
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+}
+.chart-series-line { -fx-stroke: #3b82f6; -fx-stroke-width: 2.5px; }
+
+/* =====================================================================
+   Tooltip
+   ===================================================================== */
+.tooltip {
+    -fx-background-color: rgba(15, 23, 42, 0.92);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 14px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 5);
+}
+
+/* =====================================================================
+   Form Controls
+   ===================================================================== */
+.spinner {
+    -fx-background-radius: 6px;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6px;
+}
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button { -fx-background-color: #f1f5f9; -fx-border-color: #e2e8f0; }
+
+.combo-box-base {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+.combo-box-base:focused { -fx-border-color: #3b82f6; }

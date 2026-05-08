@@ -1,0 +1,13 @@
+target/
+out/
+.idea/
+*.class
+*.jar
+*.war
+*.ear
+.project
+.classpath
+.settings/
+.DS_Store
+.gemini/
+bin/
