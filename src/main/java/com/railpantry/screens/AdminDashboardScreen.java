@@ -3,6 +3,10 @@ package com.railpantry.screens;
 import com.railpantry.SessionStore;
 import com.railpantry.SessionStore.StaffEntry;
 import com.railpantry.SessionStore.StationEntry;
+import javafx.animation.FadeTransition;
+import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -162,6 +166,29 @@ public class AdminDashboardScreen extends BorderPane {
         activeBtn.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6px;");
         activeBtn.setOnMouseEntered(null); activeBtn.setOnMouseExited(null);
         setCenter(view);
+
+        // Entrance animation if switching to analytics
+        if (view == analyticsView) {
+            animateCharts(analyticsView);
+        }
+    }
+
+    private void animateCharts(VBox parent) {
+        for (Node child : parent.getChildren()) {
+            if (child instanceof HBox) {
+                for (Node chart : ((HBox)child).getChildren()) {
+                    if (chart instanceof javafx.scene.chart.Chart) {
+                        chart.setOpacity(0);
+                        chart.setTranslateY(15);
+                        FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(600), chart);
+                        ft.setToValue(1.0);
+                        TranslateTransition tt = new TranslateTransition(javafx.util.Duration.millis(600), chart);
+                        tt.setToY(0);
+                        new ParallelTransition(ft, tt).play();
+                    }
+                }
+            }
+        }
     }
 
     private Button createSidebarButton(String text) {
@@ -359,22 +386,53 @@ public class AdminDashboardScreen extends BorderPane {
             emptyBanner.setVisible(empty);
             emptyBanner.setManaged(empty);
 
-            // Reattach tooltips after data refresh
+            // Reattach tooltips and add floaters after data refresh
             Platform.runLater(() -> {
+                double totalRevenue = pieChart.getData().stream()
+                        .filter(d -> !d.getName().contains("No Orders"))
+                        .mapToDouble(PieChart.Data::getPieValue).sum();
+
                 for (PieChart.Data data : pieChart.getData()) {
                     Node node = data.getNode();
                     if (node == null) continue;
-                    Tooltip t = new Tooltip(data.getName());
+
+                    double pct = (totalRevenue > 0) ? (data.getPieValue() / totalRevenue) * 100 : 0;
+                    String info = String.format("%s\nRevenue: ₹%d\nPercentage: %.1f%%",
+                            data.getName(), (int)data.getPieValue(), pct);
+
+                    Tooltip t = new Tooltip(info);
+                    t.setShowDelay(javafx.util.Duration.millis(100));
                     Tooltip.install(node, t);
-                    node.setOnMouseEntered(e -> { node.setTranslateY(-5); node.setStyle("-fx-cursor: hand; -fx-opacity: 0.8;"); });
-                    node.setOnMouseExited(e  -> { node.setTranslateY(0);  node.setStyle(""); });
+
+                    ScaleTransition st = new ScaleTransition(javafx.util.Duration.millis(200), node);
+                    node.setOnMouseEntered(e -> {
+                        node.setViewOrder(-1);
+                        st.setToX(1.08); st.setToY(1.08);
+                        st.playFromStart();
+                        node.setStyle("-fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 4);");
+                    });
+                    node.setOnMouseExited(e  -> {
+                        st.setToX(1.0); st.setToY(1.0);
+                        st.playFromStart();
+                        node.setStyle("");
+                    });
                 }
                 for (XYChart.Data<String, Number> data : barSeries.getData()) {
                     Node node = data.getNode();
                     if (node == null) continue;
                     Tooltip.install(node, new Tooltip(data.getXValue() + ": " + data.getYValue() + " orders"));
-                    node.setOnMouseEntered(e -> { node.setStyle("-fx-cursor: hand; -fx-opacity: 0.8;"); node.setTranslateY(-4); });
-                    node.setOnMouseExited(e  -> { node.setStyle(""); node.setTranslateY(0); });
+
+                    ScaleTransition st = new ScaleTransition(javafx.util.Duration.millis(200), node);
+                    node.setOnMouseEntered(e -> {
+                        st.setToX(1.05); st.setToY(1.1);
+                        st.playFromStart();
+                        node.setStyle("-fx-cursor: hand; -fx-opacity: 0.85;");
+                    });
+                    node.setOnMouseExited(e  -> {
+                        st.setToX(1.0); st.setToY(1.0);
+                        st.playFromStart();
+                        node.setStyle("");
+                    });
                 }
             });
         };

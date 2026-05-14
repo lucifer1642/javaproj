@@ -11,11 +11,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.io.InputStream;
@@ -128,24 +130,41 @@ public class DashboardScreen extends BorderPane {
         StackPane bannerPane = null;
         if (bannerStream != null) {
             ImageView bannerImg = new ImageView(new Image(bannerStream));
-            bannerImg.setPreserveRatio(false);
-            bannerImg.setFitHeight(90);
-            bannerImg.fitWidthProperty().bind(centerBox.widthProperty());
-
+            bannerImg.setPreserveRatio(true);
+            bannerImg.setSmooth(true);
+            
             bannerPane = new StackPane(bannerImg);
-            bannerPane.setStyle(
-                "-fx-background-radius: 12px;" +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 10, 0, 0, 4);"
-            );
-            bannerPane.setPrefHeight(90);
-            bannerPane.setMaxHeight(90);
+            bannerPane.getStyleClass().add("dashboard-banner-pane");
+            bannerPane.setPrefHeight(100);
+            bannerPane.setMinHeight(100);
+            bannerPane.setMaxHeight(100);
+            bannerPane.setMaxWidth(Double.MAX_VALUE);
+
+            // Clip for rounded corners and fixed height
+            Rectangle clip = new Rectangle();
+            clip.setArcWidth(24);
+            clip.setArcHeight(24);
+            clip.widthProperty().bind(bannerPane.widthProperty());
+            clip.heightProperty().bind(bannerPane.heightProperty());
+            bannerPane.setClip(clip);
+
+            // Bind image width to pane width, height will follow preserveRatio
+            bannerImg.fitWidthProperty().bind(bannerPane.widthProperty());
         }
 
         centerBox.getChildren().add(metricsBox);
         centerBox.getChildren().add(chartsRow1);
         if (bannerPane != null) centerBox.getChildren().add(bannerPane);
         centerBox.getChildren().add(orderChart);
-        setCenter(centerBox);
+
+        // Wrap centerBox in ScrollPane for visibility on smaller screens
+        ScrollPane scrollPane = new ScrollPane(centerBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.getStyleClass().add("dashboard-scroll-pane");
+        
+        setCenter(scrollPane);
 
         // --- Data Listeners (Real-time Sync) ---
         SessionStore.get().getOrders().addListener(
@@ -164,7 +183,12 @@ public class DashboardScreen extends BorderPane {
         startClock();
 
         // Post-render interactions
-        Platform.runLater(this::attachInteractivity);
+        Platform.runLater(() -> {
+            attachInteractivity();
+            animateChartEntrance(wasteChart);
+            animateChartEntrance(stockChart);
+            animateChartEntrance(orderChart);
+        });
     }
 
     // ============================================================
@@ -383,47 +407,88 @@ public class DashboardScreen extends BorderPane {
     }
 
     // ============================================================
-    // Interactivity (tooltips + hover)
+    // Interactivity (tooltips + hover + floaters)
     // ============================================================
+    private void animateChartEntrance(Node chart) {
+        chart.setOpacity(0);
+        chart.setTranslateY(20);
+        FadeTransition ft = new FadeTransition(Duration.millis(800), chart);
+        ft.setToValue(1.0);
+        TranslateTransition tt = new TranslateTransition(Duration.millis(800), chart);
+        tt.setToY(0);
+        new ParallelTransition(ft, tt).play();
+    }
+
     private void attachInteractivity() {
-        // Pie chart tooltips
+        // Pie chart tooltips (Floaters)
+        double totalWaste = wasteChart.getData().stream().mapToDouble(PieChart.Data::getPieValue).sum();
+
         for (PieChart.Data data : wasteChart.getData()) {
             Node node = data.getNode();
             if (node != null) {
-                Tooltip t = new Tooltip(data.getName() + " — " + (int)data.getPieValue() + " units");
+                double percentage = (totalWaste > 0) ? (data.getPieValue() / totalWaste) * 100 : 0;
+                String info = String.format("%s\nValue: %d units\nShare: %.1f%%",
+                        data.getName(), (int)data.getPieValue(), percentage);
+
+                Tooltip t = new Tooltip(info);
+                t.setShowDelay(Duration.millis(100));
                 Tooltip.install(node, t);
-                node.setOnMouseEntered(e -> { node.setTranslateY(-5); node.setStyle("-fx-cursor: hand; -fx-opacity: 0.85;"); });
-                node.setOnMouseExited(e ->  { node.setTranslateY(0);  node.setStyle(""); });
+
+                // Hover Animation: Pop-out effect
+                ScaleTransition st = new ScaleTransition(Duration.millis(200), node);
+                node.setOnMouseEntered(e -> {
+                    node.setViewOrder(-1); // Bring to front
+                    st.setToX(1.1); st.setToY(1.1);
+                    st.playFromStart();
+                    node.setStyle("-fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0.2, 0, 0);");
+                });
+                node.setOnMouseExited(e -> {
+                    st.setToX(1.0); st.setToY(1.0);
+                    st.playFromStart();
+                    node.setStyle("");
+                });
             }
         }
 
-        // Bar chart tooltips — current stock bars in red when below threshold
-        for (XYChart.Data<String, Number> data : stockSeries.getData()) {
-            Node node = data.getNode();
-            if (node != null) {
-                Tooltip t = new Tooltip(data.getXValue() + "\nQty: " + data.getYValue());
-                Tooltip.install(node, t);
-                node.setOnMouseEntered(e -> { node.setStyle("-fx-cursor: hand; -fx-opacity: 0.8;"); node.setTranslateY(-3); });
-                node.setOnMouseExited(e ->  { node.setStyle(""); node.setTranslateY(0); });
-            }
-        }
-        // Style threshold bars differently
-        for (XYChart.Data<String, Number> data : thresholdSeries.getData()) {
-            Node node = data.getNode();
-            if (node != null) {
-                node.setStyle("-fx-bar-fill: rgba(239,68,68,0.35); -fx-background-radius: 4px;");
-                Tooltip.install(node, new Tooltip("Threshold: " + data.getYValue()));
+        // Bar chart tooltips + Hover animations
+        for (XYChart.Series<String, Number> series : stockChart.getData()) {
+            for (XYChart.Data<String, Number> data : series.getData()) {
+                Node node = data.getNode();
+                if (node != null) {
+                    String seriesName = series.getName();
+                    Tooltip t = new Tooltip(seriesName + ": " + data.getYValue() + " units\nItem: " + data.getXValue());
+                    Tooltip.install(node, t);
+
+                    ScaleTransition st = new ScaleTransition(Duration.millis(200), node);
+                    node.setOnMouseEntered(e -> {
+                        st.setToX(1.05); st.setToY(1.1);
+                        st.playFromStart();
+                        node.setStyle("-fx-cursor: hand; -fx-opacity: 0.9;");
+                    });
+                    node.setOnMouseExited(e -> {
+                        st.setToX(1.0); st.setToY(1.0);
+                        st.playFromStart();
+                        node.setStyle(seriesName.equals("Threshold") ? "-fx-bar-fill: rgba(239,68,68,0.35); -fx-background-radius: 4px;" : "");
+                    });
+                }
             }
         }
 
-        // Line chart tooltips
+        // Line chart tooltips + Pulse effect on hover
         for (XYChart.Data<String, Number> data : orderSeries.getData()) {
             Node node = data.getNode();
             if (node != null) {
-                Tooltip t = new Tooltip(data.getXValue() + "\nOrders: " + data.getYValue());
+                Tooltip t = new Tooltip("Station: " + data.getXValue() + "\nOrders: " + data.getYValue());
                 Tooltip.install(node, t);
-                node.setOnMouseEntered(e -> { node.setScaleX(1.5); node.setScaleY(1.5); node.setStyle("-fx-cursor: hand;"); });
-                node.setOnMouseExited(e ->  { node.setScaleX(1.0); node.setScaleY(1.0); node.setStyle(""); });
+
+                node.setOnMouseEntered(e -> {
+                    node.setScaleX(1.8); node.setScaleY(1.8);
+                    node.setStyle("-fx-cursor: hand; -fx-effect: dropshadow(gaussian, #3b82f6, 10, 0.5, 0, 0);");
+                });
+                node.setOnMouseExited(e -> {
+                    node.setScaleX(1.0); node.setScaleY(1.0);
+                    node.setStyle("");
+                });
             }
         }
 
